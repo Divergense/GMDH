@@ -63,42 +63,42 @@ gmdh.**learn(** *x, y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularizat
 
 **Выходные данные:**
 
-y: array-like
+**y:** *array-like*
 
     Матрица результата обучения: номера использованных признаков, коэффициенты частных описаний и их
     ошибки на проверочной последовательности.
     
 ---    
 
-#### gmdh.**predict_reg(** *res_matrix, point0, ref_f='lin', lvl=1, num=0* **)**
+gmdh.**predict_reg(** *res_matrix, point0, ref_f='lin', lvl=1, num=0* **)**
 
 Вычисление точек предсказания на основе результата работы функции *learn* при параметре regularization=True.
 
 **Параметры:**
 
-res_matrix: array-like
+**res_matrix:** *array-like*
 
     Результат работы функции learn.
                 
-point0: array-like
+**point0:** *array-like*
 
     Матрица входных данных, задающая точки, для которых необходимо провести предсказание.
                 
-ref_f: {'lin', 'mul', 'squ'}, optional
+**ref_f:** *{'lin', 'mul', 'squ'}, optional*
 
     Необходимо указать вид опорной функции, использованной при вычислении res_matrix.
                 
-lvl: int, optional
+**lvl:** *int, optional*
 
     Номер ряда селекции.
                 
-num: int, optional
+**num:** *int, optional*
 
     Номер частного описания.
                 
 **Выходные данные:**
 
-y: array-like
+**y:** *array-like*
 
     Вектор точек предсказания.
                 
@@ -116,17 +116,17 @@ gmdh.**gabor(** *x, m* **)**
 
 **Параметры:**
 
-x: array-like
+**x:** *array-like*
 
     2-D матрица входных данных.
                 
-m: int
+**m:** *int*
 
     Стeпень полинома.
                     
 **Выходные данные:**
 
-y: array-like
+**y:** *array-like*
 
     2-D матрица, каждый столбец которой отражает член полинома.        
 
