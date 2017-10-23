@@ -6,8 +6,8 @@ import itertools as it
 
 def learn(data_x, data_y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True):
     """
-    нахождение коэффициентов выбранной модели
-    max_lvl - максимальное число итераций???
+    estimation polynomial coefficients of the base function
+    max_lvl - layers maximum number
     """
     ref_functions = {'lin': lin, 'mul': mul, 'squ': squ}
     crit_functions = {'ssq': crit_ssq, 'rss': crit_rss, 'prc': crit_prc, 'mimax': crit_mimax, 'nrss': crit_nrss}
@@ -18,12 +18,12 @@ def learn(data_x, data_y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regulari
     train_y = data_y[c == 1]
     test_y = data_y[c == 0]
 
-    # --------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------
     n = 0
     #  err_old = np.inf
     x, w_best, err_best, ij, n = step_learn(data_x, train_y, test_y, c, n, ref_f, crit_f, F, prnt)
     m = np.hstack([ij, w_best[:F], err_best[:F][:, np.newaxis]])[np.newaxis]
-    while n < max_lvl:  # критерий останова
+    while n < max_lvl:                                                  # stopping criterion
         #  err_old = err_best.mean()
         if regularization:
             x = np.hstack([x, data_x])
@@ -33,14 +33,14 @@ def learn(data_x, data_y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regulari
     return m
 
 
-def step_learn(x, train_y, test_y, c, n, ref_f, crit_f, F, prnt):  # средняя ошибка вычисляется по F первым моделям!!!
+def step_learn(x, train_y, test_y, c, n, ref_f, crit_f, F, prnt):       # calculating average error of the F best models
     n += 1
     x_new = []
     # err_old = err_best.mean()
-    w_all, errors, ij = find_w(x, train_y, test_y, c, ref_f, crit_f)  # кроме весов и ошибок, список из матриц всех переменных
-    w_best, err_best, ij = selection(w_all, errors, ij, F)  # ij изменяется, выбираются лучшие
+    w_all, errors, ij = find_w(x, train_y, test_y, c, ref_f, crit_f)    # list of matrixes of all features
+    w_best, err_best, ij = selection(w_all, errors, ij, F)              # ij is changed, select the bests
     if prnt:
-        print('Step {:4d} \tAVE = {:6.5f} \tmin = {:6.5f}'.format(n, err_best.mean(), err_best[0]))  # print function
+        print('Step {:4d} \tAVE = {:6.5f} \tmin = {:6.5f}'.format(n, err_best.mean(), err_best[0]))
     for k, i in enumerate(ij):
         x_new.append(value_func(ref_f(x[:, i]), w_best[k]))
     x = np.array(x_new).T
@@ -49,7 +49,7 @@ def step_learn(x, train_y, test_y, c, n, ref_f, crit_f, F, prnt):  # средн�
 
 def find_w(x, train_y, test_y, c, ref_f, crit_f):
     """
-    x - полная матрица данных
+    x - data matrix
     """
     ij = np.array(list(it.combinations(range(x.shape[1]), 2)), dtype=np.int)  # индексы всех возможных пар признаков
     w = []  # список весов опорных функций
