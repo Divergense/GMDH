@@ -7,7 +7,7 @@ import itertools as it
 def learn(data_x, data_y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True):
     """
     estimation polynomial coefficients of the base function
-    max_lvl - layers maximum number
+    max_lvl - maximum number of layers
     """
     ref_functions = {'lin': lin, 'mul': mul, 'squ': squ}
     crit_functions = {'ssq': crit_ssq, 'rss': crit_rss, 'prc': crit_prc, 'mimax': crit_mimax, 'nrss': crit_nrss}
@@ -51,17 +51,17 @@ def find_w(x, train_y, test_y, c, ref_f, crit_f):
     """
     x - data matrix
     """
-    ij = np.array(list(it.combinations(range(x.shape[1]), 2)), dtype=np.int)  # индексы всех возможных пар признаков
-    w = []  # список весов опорных функций
+    ij = np.array(list(it.combinations(range(x.shape[1]), 2)), dtype=np.int)    # indexes of all possible pair combination
+    w = []                                                                      # list of polynomial coefficients of models
     errors = []
     for i in ij:
-        x_ij = ref_f(x[:, i])  # зависит от опорной функции
+        x_ij = ref_f(x[:, i])
         w_ij = np.dot(np.linalg.inv(np.dot(x_ij[c == 1].T, x_ij[c == 1])), np.dot(x_ij[c == 1].T, train_y))
         # w_ij = np.linalg.lstsq(x_ij[c == 1], train_y)[0]
         # np.linalg.solve(np.dot(X.T, X), np.dot(X.T, Y))
-        error = crit_f(value_func(x_ij[c == 0], w_ij), test_y)  # c - global?
+        error = crit_f(value_func(x_ij[c == 0], w_ij), test_y)
         w.append(w_ij)
-        errors.append(error)  # список ошибок каждой модели
+        errors.append(error)                                                    # errors list of each models
     return np.array(w), np.array(errors), ij
 
 
@@ -87,17 +87,21 @@ def crit_nrss(y_p, y_tst):
 
 def selection(w, errors, ij, F):
     """
-    F - количество лучших моделей
+    F - number of models that have better criterion value
     """
-    ind = np.argsort(errors)  # [:n]
+    ind = np.argsort(errors)
     best_err = errors[ind]
     best_w = w[ind]
     ij = ij[ind][:F]
-    return best_w, best_err, ij  # deleted [:F]
+    return best_w, best_err, ij
 
 
 def value_func(x, w):
-    return np.dot(x, w)  # w - вектор весов, x - матрица из единиц и 2-х переменных
+    """
+    w - polynomial coefficients vector
+    x - extended matrix (additional column of ones)
+    """
+    return np.dot(x, w)
 
 
 def lin(x):
@@ -113,18 +117,17 @@ def squ(x):
 
 
 def predict_reg(res_matrix, point0, ref_f='lin', lvl=1, num=0):
-    """для моделей с регуляризацией"""
+    """use this function when models are computed by regularization"""
     ref_functions = {'lin': (lin, 3), 'mul': (mul, 4), 'squ': (squ, 6)}
     ref_f, num_ft = ref_functions[ref_f]
 
     nf = res_matrix.shape[1]
 
-    ij = [np.array(res_matrix[lvl][num:num + 1, :2].ravel(), dtype=np.int)[np.newaxis, :]]  # первый элемент матрица!
+    ij = [np.array(res_matrix[lvl][num:num + 1, :2].ravel(), dtype=np.int)[np.newaxis, :]]      # the first element is matrix
     ii = ij[0]
 
     w_ij = [res_matrix[lvl][num:num + 1, 2:2 + num_ft]]
     for i in range(lvl - 1, -1, -1):
-        # ii проверять на превышение количества
         ii = np.array(res_matrix[i][ii[ii < nf], :2], dtype=np.int)
         ij.append(ii)
         i3 = np.array(map(lambda x: (x == res_matrix[i][:, :2]).all(1), ii))
@@ -133,14 +136,15 @@ def predict_reg(res_matrix, point0, ref_f='lin', lvl=1, num=0):
     if len(point0.shape) == 1:
         point0 = point0[np.newaxis, :]
 
-    point = map(lambda ind, w: value_func(ref_f(point0[:, ind]), w), ij[-1], w_ij[-1])  # ind!!!
+    point = map(lambda ind, w: value_func(ref_f(point0[:, ind]), w), ij[-1], w_ij[-1])
     point = np.array(point).T
 
     for i in range(lvl - 1, -1, -1):
         j = 0
         point2 = []
         for ind in ij[i]:
-            if (ind >= nf).any():  # на основании, что превышающий признак только 1 и всегда под индексом 1
+            if (ind >= nf).any():  
+                # because outnumber feature is always one and has index 1
                 point2.append(np.vstack([point[:, j], point0[:, ind[1] - nf]]).T)
                 j += 1
             else:
@@ -153,16 +157,16 @@ def predict_reg(res_matrix, point0, ref_f='lin', lvl=1, num=0):
 
 
 def predict(res_matrix, point, ref_f='lin', lvl=1, num=0):
-    """для моделей без регуляризации"""
+    """use this function when models are computed without regularization"""
     ref_functions = {'lin': (lin, 3), 'mul': (mul, 4), 'squ': (squ, 6)}
     ref_f, num_ft = ref_functions[ref_f]
 
-    ij = [np.array(res_matrix[lvl][num:num + 1, :2].ravel(), dtype=np.int)[np.newaxis, :]]  # первый элемент матрица
+    ij = [np.array(res_matrix[lvl][num:num + 1, :2].ravel(), dtype=np.int)[np.newaxis, :]]      # the first element is matrix
     ii = ij[0]
 
     w_ij = [res_matrix[lvl][num:num + 1, 2:2 + num_ft]]
     for i in range(lvl - 1, -1, -1):
-        ii = np.array(res_matrix[i][ii.ravel(), :2], dtype=np.int)  # лучше сразу w_ij?
+        ii = np.array(res_matrix[i][ii.ravel(), :2], dtype=np.int)
         ij.append(ii)
         i3 = np.array(map(lambda x: (x == res_matrix[i][:, :2]).all(1), ii))
         w_ij.append(np.array(map(lambda ind: res_matrix[i][ind, 2:2 + num_ft].ravel(), i3)))
@@ -170,8 +174,8 @@ def predict(res_matrix, point, ref_f='lin', lvl=1, num=0):
     if len(point.shape) == 1:
         point = point[np.newaxis, :]
 
-    point = map(lambda ind, w: value_func(ref_f(point[:, ind]), w), ij[-1], w_ij[-1])  # список(!) вектор-признаков
-    point = np.array(point).T  # матрица вектор-признаков (уже столбцы)
+    point = map(lambda ind, w: value_func(ref_f(point[:, ind]), w), ij[-1], w_ij[-1])           # list! of feature vectors
+    point = np.array(point).T                                                                   # matrix of feature vectors
 
     for i in range(lvl - 1, -1, -1):
         point = [point[:, j:j + 2] for j in np.arange(0, point.shape[1], 2)]
@@ -182,8 +186,9 @@ def predict(res_matrix, point, ref_f='lin', lvl=1, num=0):
 
 def gabor(x, m):
     """
-    m - степень полинома
-    C^k_{k+n-1} - число переменных на k порядке полинома
+    Kolmogorov-Gabor polynomial
+    m - polinomial order
+    C^k_{k+n-1} - number of summand
     kl←{+/⍵!⍺+⍵-1}
     """
     s = map(lambda n: np.array(list(it.combinations_with_replacement(range(x.shape[1]), n))),
