@@ -14,7 +14,7 @@ Group Method of Data Handling
 
 **Параметры:** 
 
->             x: array-like
+              x: array-like
 >                Матрица входных данных, в которой каждый столбец является переменной, а строка -- измерением.   
                 
 >             y: array-like
