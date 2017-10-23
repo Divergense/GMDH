@@ -6,7 +6,7 @@ Group Method of Data Handling
 ##  Функции
 
 
-gmdh.**learn(** *x, y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True* **)**
+#### gmdh.**learn(** *x, y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True* **)**
 
 Оценивание коэффициентов опорных функций методом наименьших квадратов и селекция *F* наилучших на каждом 
 ряду селекции, число которых задаётся параметром *max_lvl*.
@@ -70,7 +70,7 @@ y: array-like
     
 ---    
 
-gmdh.**predict_reg(** *res_matrix, point0, ref_f='lin', lvl=1, num=0* **)**
+#### gmdh.**predict_reg(** *res_matrix, point0, ref_f='lin', lvl=1, num=0* **)**
 
 Вычисление точек предсказания на основе результата работы функции *learn* при параметре regularization=True.
 
