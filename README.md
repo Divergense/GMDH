@@ -6,18 +6,18 @@ Group Method of Data Handling
 ##  Функции
 
 
-**gmdh.learn(** *x, y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True* **)**
+gmdh.**learn(** *x, y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regularization=False, prnt=True* **)**
 
 Оценивание коэффициентов опорных функций методом наименьших квадратов и селекция *F* наилучших на каждом 
 ряду селекции, число которых задаётся параметром *max_lvl*.
 
 **Параметры:** 
 
-x: array-like
+**x**: array-like
 
     Матрица входных данных, в которой каждый столбец является переменной, а строка -- измерением.   
                 
-y: array-like
+**y**: array-like
 
     1-D вектор выходной величины.
                 
