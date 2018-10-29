@@ -1,5 +1,5 @@
 # GMDH
-Group Method of Data Handling
+Group Method of Data Handling (It works on Python 2)
 
 # Описание возможностей
 
