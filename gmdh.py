@@ -28,8 +28,8 @@ def learn(data_x, data_y, c, F=6, ref_f='lin', crit_f='ssq', max_lvl=3, regulari
         if regularization:
             x = np.hstack([x, data_x])
         x, w_best, err_best, ij, n = step_learn(x, train_y, test_y, c, n, ref_f, crit_f, F, prnt)
-        m2 = np.hstack([ij, w_best[:F], err_best[:F][:, np.newaxis]])
-        m = np.vstack([m, [m2]])
+        m2 = np.hstack([ij, w_best[:F], err_best[:F][:, np.newaxis]])[np.newaxis]
+        m = np.vstack((m, m2))
     return m
 
 
